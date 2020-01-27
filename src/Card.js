@@ -22,6 +22,10 @@ const Card = (props) => {
     })
   }
 
+  const handleCancelAddTodo = () => {
+    setIsAddingTodo(false)
+  }
+
   const handleRemoveTodo = (todoId) => {
     setTodos(prevTodos => {
       return prevTodos.filter(todo => todo.id !== todoId)
@@ -36,74 +40,141 @@ const Card = (props) => {
     return todo
   }
 
-  const handleSubmitEditTodo = (e) => {
+  const getTodoIndex = (id) => todos.findIndex(todo => todo.id === id)
+
+  const getCardClone = (id) => {
+    let card = {
+      ...props.cards.find(card => card.id === id)
+    }
+
+    return card
+  }
+
+  const getCardIndex = (id) => props.cards.findIndex(card => card.id === id)
+
+  const handleSubmitEdit = (e) => {
     if (e.key === 'Enter') {
-      props.setTodoBeingEdited(null)
+      props.setIdBeingEdited(null)
     }
   }
 
-  const getTodoIndex = (id) => todos.findIndex(todo => todo.id === id)
 
-  const handleChange = (e, todoId) => {
-
+  const handleClick = (e, todoId) => {
     let name = e.target.getAttribute('name')
-    let value = e.target.value
 
     if (name === 'editTodo') {
-      props.setTodoBeingEdited(todoId)
+      props.setIdBeingEdited(todoId)
       return
     }
+  }
 
+  const handleTodoChange = (id, name, value) => {
     setTodos(prevTodos => {
       let newTodos
-      let index = getTodoIndex(todoId)
-      let todo = getTodoClone(todoId)
+      let index = getTodoIndex(id)
+      let todo = getTodoClone(id)
 
       if (name === 'completed') {
         todo.completed = !todo.completed
       }
 
-      if (name === 'description') {
+      if (name === 'input') {
         todo.description = value
       }
       
-      newTodos = prevTodos.filter(todo => todo.id !== todoId)
+      newTodos = prevTodos.filter(todo => todo.id !== id)
       newTodos.splice(index, 0, todo)
 
       return newTodos
     })
   }
 
-  return (
-    <div className="card">
-      <button onClick={showAddTodoForm}>+</button>
-      <ul>
-        {todos.map((todo, index) => {
-          return (<li key={index} className={todo.completed ? "completed" : undefined}>
-                    <input type="checkbox" 
-                    name="completed" 
-                    checked={todo.completed}
-                    onChange={(e) => handleChange(e, todo.id)}>
-                    </input>
+  const handleCardChange = (id, value) => {
+    props.setCards(prevCards => {
+      let newCards
+      let index = getCardIndex(id)
+      let card = getCardClone(id)
 
-                    {props.todoBeingEdited === todo.id ?
-                      <input type="text" name="description" value={todo.description}
-                      onKeyPress={handleSubmitEditTodo} onChange={(e) => handleChange(e, todo.id)}/> :
-                      <span name="editTodo" todoid={todo.id}
-                      onClick={(e) => handleChange(e, todo.id)}>
-                        {todo.description}
-                      </span>}
-                    <button onClick={() => handleRemoveTodo(todo.id)}>-</button>
+      card.title = value
+
+      newCards = prevCards.filter(card => card.id !== id)
+      newCards.splice(index, 0, card)
+
+      return newCards
+    })
+
+  }
+
+  const handleChange = (e, id) => {
+    let name = e.target.getAttribute('name')
+    let type = e.target.dataset.type
+    let value = e.target.value
+
+    if (type === 'todo') {
+      handleTodoChange(id, name, value)
+    }
+
+    if (type === 'card') {
+      handleCardChange(id, value)
+    }
+  }
+
+  return (
+    <div className="card col-12 col-sm-6 col-md-4 col-lg-3 d-flex p-3">
+      {props.idBeingEdited === props.cardId ?
+      <input type="text" name="input" value={props.cardTitle} data-type="card"
+      onKeyPress={handleSubmitEdit} onChange={(e) => handleChange(e, props.cardId)}/> :
+      <h2 className="mx-auto" data-id={props.cardId}>
+        {props.cardTitle}
+      </h2>
+      }
+      <ul className="list-group list-group-flush">
+        {todos.map((todo, index) => {
+          return (<li key={index}
+                    className={`list-group-item d-flex
+                    align-items-center
+                    ${todo.completed ? "completed" : undefined}`}>
+                      <input type="checkbox" 
+                      name="completed"
+                      className="mr-2"
+                      checked={todo.completed}
+                      onChange={(e) => handleChange(e, todo.id)}>
+                      </input>
+
+                    {props.idBeingEdited === todo.id ?
+                      <input type="text" name="input" value={todo.description} data-type="todo"
+                      onKeyPress={handleSubmitEdit} onChange={(e) => handleChange(e, todo.id)}
+                      className="w-100"/> :
+                      <>
+                        <span name="editTodo" data-id={todo.id}
+                        onClick={(e) => handleClick(e, todo.id)}>
+                          {todo.description}
+                        </span>
+                        <span className="ml-auto">
+                          <i className="fas fa-trash" onClick={() => handleRemoveTodo(todo.id)}></i>
+                        </span>
+                      </>}
                   </li>)
         })}
       </ul>
-      {isAddingTodo &&
+      {isAddingTodo ?
         <>
-          <input type= "text" id={props.cardId}></input>
-          <button onClick={handleAddTodo}>Add Todo</button><button>Cancel</button>
-        </>
+          <input type= "text" className="mt-auto mb-2" id={props.cardId}></input>
+          <div className="mx-auto">
+            <button onClick={handleAddTodo}
+            className="mx-auto btn btn-outline-primary">
+              Add Todo
+            </button>
+            <button onClick={handleCancelAddTodo}
+            className="mx-auto btn btn-outline-primary">
+              Cancel
+            </button>
+          </div>
+        </> :
+        <button className="mt-auto mx-auto btn btn-outline-primary" onClick={showAddTodoForm}>
+          <i className="fas fa-plus"></i> Add Todo
+        </button>
       }
-      
     </div>
   )
 }
