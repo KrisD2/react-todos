@@ -102,7 +102,12 @@ const Card = (props) => {
 
       return newCards
     })
+  }
 
+  const handleDeleteCard = (cardId) => {
+    props.setCards(prevCards => {
+      return prevCards.filter(card => card.id !== cardId)
+    })
   }
 
   const handleChange = (e, id) => {
@@ -121,6 +126,10 @@ const Card = (props) => {
 
   return (
     <div className="card col-12 col-sm-6 col-md-4 col-lg-3 d-flex p-3">
+      <button type="button" className="close" aria-label="Close"
+      onClick={() => handleDeleteCard(props.cardId)}>
+        <span aria-hidden="true">&times;</span>
+      </button>
       {props.idBeingEdited === props.cardId ?
       <input type="text" name="input" value={props.cardTitle} data-type="card"
       onKeyPress={handleSubmitEdit} onChange={(e) => handleChange(e, props.cardId)}/> :
@@ -128,7 +137,7 @@ const Card = (props) => {
         {props.cardTitle}
       </h2>
       }
-      <ul className="list-group list-group-flush">
+      <ul className="list-group list-group-flush mb-3">
         {todos.map((todo, index) => {
           return (<li key={index}
                     className={`list-group-item d-flex
