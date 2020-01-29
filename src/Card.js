@@ -1,9 +1,20 @@
-import React, { useState } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import uuidv1 from 'uuid/v1'
 
 const Card = (props) => {
   const [isAddingTodo, setIsAddingTodo] = useState(false)
   const [todos, setTodos] = useState([])
+  const editTitleInput = useRef(null)
+  const addTodoInput = useRef(null)
+  const editTodoInput = useRef(null)
+
+  useEffect(() => {
+    [editTitleInput, addTodoInput, editTodoInput].forEach((input) => {
+      if (input.current) {
+        input.current.focus()
+      }
+    })
+  })
 
   const showAddTodoForm = () => {
     setIsAddingTodo(true)
@@ -57,7 +68,6 @@ const Card = (props) => {
       props.setIdBeingEdited(null)
     }
   }
-
 
   const handleClick = (e, todoId) => {
     let name = e.target.getAttribute('name')
@@ -132,7 +142,8 @@ const Card = (props) => {
       </button>
       {props.idBeingEdited === props.cardId ?
       <input type="text" name="input" value={props.cardTitle} data-type="card"
-      onKeyPress={handleSubmitEdit} onChange={(e) => handleChange(e, props.cardId)}/> :
+      onKeyPress={handleSubmitEdit} ref={editTitleInput} className="w-50 mx-auto"
+      onChange={(e) => handleChange(e, props.cardId)}/> :
       <h2 className="mx-auto" data-id={props.cardId}>
         {props.cardTitle}
       </h2>
@@ -152,8 +163,8 @@ const Card = (props) => {
 
                     {props.idBeingEdited === todo.id ?
                       <input type="text" name="input" value={todo.description} data-type="todo"
-                      onKeyPress={handleSubmitEdit} onChange={(e) => handleChange(e, todo.id)}
-                      className="w-100"/> :
+                      onKeyPress={handleSubmitEdit} ref={editTodoInput}
+                      onChange={(e) => handleChange(e, todo.id)} className="w-100"/> :
                       <>
                         <span name="editTodo" data-id={todo.id}
                         onClick={(e) => handleClick(e, todo.id)}>
@@ -168,7 +179,7 @@ const Card = (props) => {
       </ul>
       {isAddingTodo ?
         <>
-          <input type= "text" className="mt-auto mb-2" id={props.cardId}></input>
+          <input type= "text" className="mt-auto mb-2" id={props.cardId} ref={addTodoInput}/>
           <div className="mx-auto">
             <button onClick={handleAddTodo}
             className="mx-auto btn btn-outline-primary">
