@@ -2,8 +2,29 @@
   min-height: 250px;
   border: none;
   border-radius: 0;
-  border-right: 1px solid gray;
-  border-bottom: 1px solid gray;
+  border-right: 1px solid #ff6200;
+  border-bottom: 1px solid #ff6200;
+}
+
+.card-selected {
+  border-right: 2px solid #ff6200;
+  border-bottom: 2px solid #ff6200;
+}
+
+.close-card {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.close-li {
+  position: absolute;
+  right: 0;
+  top: auto;
+}
+
+.close:hover {
+  color: #ff6200;
 }
 
 .completed {
@@ -11,13 +32,21 @@
   color: gray;
 }
 
+.fa-trash {
+  color: grey;
+}
+
+.fa-trash:hover {
+  color: #ff6200;
+}
+
 .sidebar {
-  background-color: lightcyan;
+  background-color: white;
+  border-right: 1px solid #ff6200;
   min-height: 100vh;
 }
 
-.close {
-  position: absolute;
-  right: 5px;
-  top: 0px;
+
+.sidebar-list-item:hover {
+  color: #ff6200;
 }

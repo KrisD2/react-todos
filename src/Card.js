@@ -33,6 +33,12 @@ const Card = (props) => {
     })
   }
 
+  const handleAddTodoKeypress = (e) => {
+    if (e.key === 'Enter') {
+      handleAddTodo()
+    }
+  }
+
   const handleCancelAddTodo = () => {
     setIsAddingTodo(false)
   }
@@ -52,16 +58,6 @@ const Card = (props) => {
   }
 
   const getTodoIndex = (id) => todos.findIndex(todo => todo.id === id)
-
-  const getCardClone = (id) => {
-    let card = {
-      ...props.cards.find(card => card.id === id)
-    }
-
-    return card
-  }
-
-  const getCardIndex = (id) => props.cards.findIndex(card => card.id === id)
 
   const handleSubmitEdit = (e) => {
     if (e.key === 'Enter') {
@@ -99,27 +95,6 @@ const Card = (props) => {
     })
   }
 
-  const handleCardChange = (id, value) => {
-    props.setCards(prevCards => {
-      let newCards
-      let index = getCardIndex(id)
-      let card = getCardClone(id)
-
-      card.title = value
-
-      newCards = prevCards.filter(card => card.id !== id)
-      newCards.splice(index, 0, card)
-
-      return newCards
-    })
-  }
-
-  const handleDeleteCard = (cardId) => {
-    props.setCards(prevCards => {
-      return prevCards.filter(card => card.id !== cardId)
-    })
-  }
-
   const handleChange = (e, id) => {
     let name = e.target.getAttribute('name')
     let type = e.target.dataset.type
@@ -130,14 +105,14 @@ const Card = (props) => {
     }
 
     if (type === 'card') {
-      handleCardChange(id, value)
+      props.handleCardChange(id, value)
     }
   }
 
   return (
-    <div className="card col-12 col-sm-6 col-md-4 col-lg-3 d-flex p-3">
-      <button type="button" className="close" aria-label="Close"
-      onClick={() => handleDeleteCard(props.cardId)}>
+    <div className={"card col-12 col-sm-6 col-md-4 col-lg-3 d-flex p-3 " + (props.cardHover ? 'card-selected' : "")}>
+      <button type="button" className="close close-card" aria-label="Close"
+      onClick={() => props.handleDeleteCard(props.cardId)}>
         <span aria-hidden="true">&times;</span>
       </button>
       {props.idBeingEdited === props.cardId ?
@@ -158,6 +133,7 @@ const Card = (props) => {
                       name="completed"
                       className="mr-2"
                       checked={todo.completed}
+                      data-type="todo"
                       onChange={(e) => handleChange(e, todo.id)}>
                       </input>
 
@@ -173,13 +149,15 @@ const Card = (props) => {
                         <span className="ml-auto">
                           <i className="fas fa-trash" onClick={() => handleRemoveTodo(todo.id)}></i>
                         </span>
-                      </>}
+                      </>
+                    }
                   </li>)
         })}
       </ul>
       {isAddingTodo ?
         <>
-          <input type= "text" className="mt-auto mb-2" id={props.cardId} ref={addTodoInput}/>
+          <input type= "text" className="mt-auto mb-2" id={props.cardId} ref={addTodoInput}
+            onKeyPress={handleAddTodoKeypress}/>
           <div className="mx-auto">
             <button onClick={handleAddTodo}
             className="mx-auto btn btn-outline-primary">
